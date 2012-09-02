@@ -19,13 +19,15 @@ parseJsonValue all@(x:xs) | isPrefixOf "null" all  = (JsonNull, drop 4 all)
                           | x == '"'               = parseString all
 
 parseInt :: [Char] -> (JsonValue, [Char])
-parseInt ('-':xs) = let parsed = parseInt' xs 0 1 in (JsonInt (negate (fst parsed)), snd parsed)
-parseInt xs       = let parsed = parseInt' xs 0 1 in (JsonInt (fst parsed), snd parsed)
+parseInt all@(x:xs) | x == '-'  = (JsonInt (negate int), remaining)
+                    | otherwise = (JsonInt int, remaining)
+                      where (int, remaining) = parseInt' digits 0 1
+                            digits           = if x == '-' then xs else all
 
 parseInt' :: [Char] -> Int -> Int -> (Int, [Char])
-parseInt' all@(x:xs) i m | isDigit x = let parsed = parseInt' xs (i * m + (digitToInt x)) (m * 10)
-                                       in (fst parsed, snd parsed)
+parseInt' all@(x:xs) i m | isDigit x = parseInt' xs decimalValue (m * 10)
                          | otherwise = (i, all)
+                           where decimalValue = i * m + digitToInt x
 
 parseList :: [Char] -> (JsonValue, [Char])
 parseList xs = let parsed = parseList' xs in (JsonList (fst parsed), snd parsed)
