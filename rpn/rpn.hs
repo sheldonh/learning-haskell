@@ -17,7 +17,8 @@ interpret (x:xs) = toRpnOp x : interpret xs
 	toRpnOp xs' = RpnInt (read xs' :: Int)
 
 solve :: [RpnOp] -> Int
-solve ops = go ops []
-  where go [] ((RpnInt i):_) = i
-        go ((RpnInt i):xs) stack = go xs ((RpnInt i):stack)
-        go ((RpnOp f):xs) ((RpnInt x):(RpnInt y):stack) = go xs ((RpnInt (f y x)):stack)
+solve ops = head $ foldl calculator [] ops
+
+calculator :: [Int] -> RpnOp -> [Int]
+calculator stack    (RpnInt i) = i : stack
+calculator (x:y:xs) (RpnOp fn) = (fn y x) : xs
