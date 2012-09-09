@@ -20,4 +20,4 @@ solve :: [RpnOp] -> Int
 solve ops = go ops []
   where go [] ((RpnInt i):_) = i
         go ((RpnInt i):xs) stack = go xs ((RpnInt i):stack)
-        go ((RpnOp f):xs) ((RpnInt x):(RpnInt y):stack) = go xs ((RpnInt (f x y)):stack)
+        go ((RpnOp f):xs) ((RpnInt x):(RpnInt y):stack) = go xs ((RpnInt (f y x)):stack)
